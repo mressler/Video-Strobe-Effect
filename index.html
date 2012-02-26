@@ -176,29 +176,29 @@ function isDifferent(sourceValue, currentValue, diffNumber) {
         
         <table>
             <tr>
-                <td><input type="button" value="Set Source Frame" onclick="setSourceFrame()" /></td>
+                <td><input type="button" value="Set Source Frame" onclick="setSourceFrame()" title="This sets the frame that has nothing moving in it.  We call it the 'source frame'." /></td>
                 <td><input type="text" id="sourceFrameTime" value="32.2"/></td>
-                <td><input type="button" value="Go/Set" onclick="goToTime('sourceFrameTime')" /></td>
+                <td><input type="button" value="Go/Set" onclick="goToTime('sourceFrameTime')" title="Go to the time value in this text box, or set the text box with the current time." /></td>
             </tr>
             <tr>
                 <td>Start Frame</td>
                 <td><input type="text" id="startFrameTime" value="33"/></td>
-                <td><input type="button" value="Go/Set" onclick="goToTime('startFrameTime')" /></td>
+                <td><input type="button" value="Go/Set" onclick="goToTime('startFrameTime')" title="Go to the time value in this text box, or set the text box with the current time."/></td>
             </tr>
             <tr>
                 <td>End Frame</td>
                 <td><input type="text" id="endFrameTime" value="34.4"/></td>
-                <td><input type="button" value="Go/Set" onclick="goToTime('endFrameTime')" /></td>
+                <td><input type="button" value="Go/Set" onclick="goToTime('endFrameTime')" title="Go to the time value in this text box, or set the text box with the current time."/></td>
             </tr>
             <tr>
-                <td><input type="button" value="Advance Video" onclick="advanceVideo()" /></td>
+                <td><input type="button" value="Advance Video" onclick="advanceVideo()" title="Advance the video by the number of seconds in this box."/></td>
                 <td><input type="text" id="advanceSeconds" value=".2" /></td>
             </tr>
             <tr>
-                <td><input type="button" value="Calculate Delta" onclick="calculateDelta()" /></td>
-                <td><input type="text" id="diffNumber" value="20" /></td>
-                <td><input type="button" value="Overlay" onclick="overlay()" /></td>
-                <td><input type="button" value="Automate" onclick="automate()" /></td>
+                <td><input type="button" value="Calculate Delta" onclick="calculateDelta()" title="Calculate what is different between the current video frame and the 'source frame'."/></td>
+                <td><input type="text" id="diffNumber" value="20" title="How sensitive should the diff calculation be?  Lower numbers are more sensitive." /></td>
+                <td><input type="button" value="Overlay" onclick="overlay()" title="Overlay the current diff calculation on top of the result canvas."/></td>
+                <td><input type="button" value="Automate" onclick="automate()" title="Automate the process of overlaying diffs between 'start frame' and 'end frame'."/></td>
             </tr>
         </table>
 		
