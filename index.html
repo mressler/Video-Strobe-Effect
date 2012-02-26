@@ -1,0 +1,256 @@
+<html>
+	<head>
+		<title>It's Just StatEasy&trade;</title>
+	</head>
+
+<style>
+    #dropHere {
+        width: 80%;
+        height: 80%;
+        border: 4px dashed Blue;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+    }
+    
+    #dropHere.over {
+        border: 4px solid Blue;
+    }
+</style> 
+	
+	<body>
+       
+
+<script> 
+
+var v;
+var sourceFrame;
+var sourceContext;
+var resultFrame;
+var resultContext;
+var delta;
+var deltaContext;
+var back;
+var backContext;
+var seekFunction = undefined;
+	
+document.addEventListener('DOMContentLoaded', function(){
+	v = document.getElementById('v');
+	sourceFrame = document.getElementById('sourceFrame');
+    sourceContext = sourceFrame.getContext('2d');
+    resultFrame = document.getElementById('resultFrame');
+    resultContext = resultFrame.getContext('2d');
+	delta = document.getElementById('delta');
+	deltaContext = delta.getContext('2d');
+	back = document.createElement('canvas');
+	backContext = back.getContext('2d');
+                          
+    v.addEventListener("seeked", function() {
+        if (seekFunction != undefined) {
+            seekFunction();
+        }
+    });
+                          
+    var dropHere = document.getElementById("dropHere");
+    dropHere.addEventListener("dragenter", function () {
+        this.className = "over";
+        return false;                                            
+    });
+    dropHere.addEventListener("dragleave", function () {
+        this.className = "";
+        return false;                                            
+    });
+    dropHere.addEventListener("drop", function (e) {
+        noOpHandler(e);
+        this.className = "";
+
+        var dt = e.dataTransfer;
+        var files = dt.files;
+        var file = files[0];
+
+        var reader = new FileReader();
+        reader.onload = function (evt) {
+            v.src = evt.target.result;
+            v.load();
+
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+        }
+        reader.readAsDataURL(file);
+
+        
+        return false;
+    });
+    dropHere.addEventListener("dragexit", noOpHandler, false);
+    dropHere.addEventListener("dragover", noOpHandler, false);
+    
+    
+},false);
+
+function noOpHandler(e) {
+	e.stopPropagation();
+	e.preventDefault();
+
+	return false;
+}
+
+function goToTime(timeValueId) {
+    var sourceFrameTime = Number(document.getElementById(timeValueId).value);
+    
+    if (!sourceFrameTime) {
+        document.getElementById(timeValueId).value = v.currentTime;
+    } else {
+        v.currentTime = sourceFrameTime;
+    }
+}
+        
+function setSourceFrame() {
+    var sourceFrameTime = Number(document.getElementById('sourceFrameTime').value);
+    
+    if (!sourceFrame) {
+        document.getElementById('sourceFrameTime').value = v.currentTime;
+    }
+    
+	var width = v.clientWidth;
+	var height = v.clientHeight;
+    
+	sourceFrame.width = width;
+	sourceFrame.height = height;
+    
+	resultFrame.width = width;
+	resultFrame.height = height;
+
+	delta.width = width;
+	delta.height = height;
+
+	back.width = width;
+	back.height = height;
+	
+	sourceContext.drawImage(v, 0, 0, width, height);
+    resultContext.drawImage(v, 0, 0, width, height);
+}
+
+function advanceVideo() {
+	var advSeconds = Number(document.getElementById('advanceSeconds').value);
+
+	if (!advSeconds) {
+		advSeconds = 0.1;
+	}
+
+	v.currentTime = v.currentTime + advSeconds;
+}
+
+function calculateDelta() {
+	var diffNumber = Number(document.getElementById('diffNumber').value);
+    
+	if (!diffNumber) {
+		diffNumber = 0.1;
+	}
+    
+	var width = v.clientWidth;
+	var height = v.clientHeight;
+
+	backContext.drawImage(v, 0, 0, width, height);
+	var currentIData = backContext.getImageData(0, 0, width, height);
+	var currentData = currentIData.data;
+	
+	var sourceIData = sourceContext.getImageData(0, 0, width, height);
+	var sourceData = sourceIData.data;
+
+	for (var i = 0; i < sourceData.length; i += 4) {
+		var sourceValue = [sourceData[i], sourceData[i + 1], sourceData[i + 2]];
+		var currentValue = [currentData[i], currentData[i + 1], currentData[i + 2]];
+
+		if (isDifferent(sourceValue, currentValue, diffNumber)) {
+            //currentData[i] = 0;
+            //currentData[i + 1] = 0;
+            //currentData[i + 2] = 0;
+		} else {
+            // Make it invisible
+            currentData[i + 3] = 0;
+        }
+	}
+    
+    currentIData.data = currentData;
+    deltaContext.putImageData(currentIData, 0, 0);
+}
+        
+function overlay() {
+        
+    var width = v.clientWidth;
+    var height = v.clientHeight;
+        
+    resultContext.drawImage(delta, 0, 0, width, height);
+}
+    
+function automate() {
+    goToTime("sourceFrameTime");
+    seekFunction = function () {
+        setSourceFrame();
+        goToTime("startFrameTime");
+        seekFunction = function () {
+            var endFrameTime = Number(document.getElementById("endFrameTime").value);
+            if (endFrameTime < v.currentTime) {
+                seekFunction = undefined;
+                return;
+            }
+            
+            calculateDelta();
+            overlay();
+            advanceVideo();
+        };
+    };
+}
+
+function isDifferent(sourceValue, currentValue, diffNumber) {
+
+	return Math.abs(sourceValue[0] - currentValue[0]) > diffNumber ||
+            Math.abs(sourceValue[1] - currentValue[1]) > diffNumber ||
+            Math.abs(sourceValue[2] - currentValue[2]) > diffNumber;
+}
+</script> 
+        
+    <div id="step1">
+        <h1>Step 1</h1>
+        <p>Drag a video onto the box below.  We'll use this video to product the strobe effect.</p>
+        <div id="dropHere"></div>
+    </div>
+	
+    <div id="step2" style="display:none">
+		<video id="v" controls>
+		    <source src="Hitting.ogv" type="video/ogg">
+		</video>
+        <canvas id="resultFrame"></canvas>
+        
+        <table>
+            <tr>
+                <td><input type="button" value="Set Source Frame" onclick="setSourceFrame()" /></td>
+                <td><input type="text" id="sourceFrameTime"/></td>
+                <td><input type="button" value="Go/Set" onclick="goToTime('sourceFrameTime')" /></td>
+            </tr>
+            <tr>
+                <td>Start Frame</td>
+                <td><input type="text" id="startFrameTime"/></td>
+                <td><input type="button" value="Go/Set" onclick="goToTime('startFrameTime')" /></td>
+            </tr>
+            <tr>
+                <td>End Frame</td>
+                <td><input type="text" id="endFrameTime"/></td>
+                <td><input type="button" value="Go/Set" onclick="goToTime('endFrameTime')" /></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="Advance Video" onclick="advanceVideo()" /></td>
+                <td><input type="text" id="advanceSeconds" value=".2" /></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="Calculate Delta" onclick="calculateDelta()" /></td>
+                <td><input type="text" id="diffNumber" value="20" /></td>
+                <td><input type="button" value="Overlay" onclick="overlay()" /></td>
+                <td><input type="button" value="Automate" onclick="automate()" /></td>
+            </tr>
+        </table>
+		
+		<canvas id="sourceFrame"></canvas>
+		<canvas id="delta"></canvas>
+    </div>
+	</body>
+</html>
