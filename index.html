@@ -49,49 +49,9 @@ document.addEventListener('DOMContentLoaded', function(){
             seekFunction();
         }
     });
-                          
-    var dropHere = document.getElementById("dropHere");
-    dropHere.addEventListener("dragenter", function () {
-        this.className = "over";
-        return false;                                            
-    });
-    dropHere.addEventListener("dragleave", function () {
-        this.className = "";
-        return false;                                            
-    });
-    dropHere.addEventListener("drop", function (e) {
-        noOpHandler(e);
-        this.className = "";
-
-        var dt = e.dataTransfer;
-        var files = dt.files;
-        var file = files[0];
-
-        var reader = new FileReader();
-        reader.onload = function (evt) {
-            v.src = evt.target.result;
-            v.load();
-
-            document.getElementById("step1").style.display = "none";
-            document.getElementById("step2").style.display = "block";
-        }
-        reader.readAsDataURL(file);
-
-        
-        return false;
-    });
-    dropHere.addEventListener("dragexit", noOpHandler, false);
-    dropHere.addEventListener("dragover", noOpHandler, false);
     
     
 },false);
-
-function noOpHandler(e) {
-	e.stopPropagation();
-	e.preventDefault();
-
-	return false;
-}
 
 function goToTime(timeValueId) {
     var sourceFrameTime = Number(document.getElementById(timeValueId).value);
@@ -208,14 +168,7 @@ function isDifferent(sourceValue, currentValue, diffNumber) {
             Math.abs(sourceValue[2] - currentValue[2]) > diffNumber;
 }
 </script> 
-        
-    <div id="step1">
-        <h1>Step 1</h1>
-        <p>Drag a video onto the box below.  We'll use this video to product the strobe effect.</p>
-        <div id="dropHere"></div>
-    </div>
-	
-    <div id="step2" style="display:none">
+
 		<video id="v" controls>
 		    <source src="Hitting.ogv" type="video/ogg">
 		</video>
@@ -224,17 +177,17 @@ function isDifferent(sourceValue, currentValue, diffNumber) {
         <table>
             <tr>
                 <td><input type="button" value="Set Source Frame" onclick="setSourceFrame()" /></td>
-                <td><input type="text" id="sourceFrameTime"/></td>
+                <td><input type="text" id="sourceFrameTime" value="32.2"/></td>
                 <td><input type="button" value="Go/Set" onclick="goToTime('sourceFrameTime')" /></td>
             </tr>
             <tr>
                 <td>Start Frame</td>
-                <td><input type="text" id="startFrameTime"/></td>
+                <td><input type="text" id="startFrameTime" value="33"/></td>
                 <td><input type="button" value="Go/Set" onclick="goToTime('startFrameTime')" /></td>
             </tr>
             <tr>
                 <td>End Frame</td>
-                <td><input type="text" id="endFrameTime"/></td>
+                <td><input type="text" id="endFrameTime" value="34.4"/></td>
                 <td><input type="button" value="Go/Set" onclick="goToTime('endFrameTime')" /></td>
             </tr>
             <tr>
@@ -251,6 +204,5 @@ function isDifferent(sourceValue, currentValue, diffNumber) {
 		
 		<canvas id="sourceFrame"></canvas>
 		<canvas id="delta"></canvas>
-    </div>
 	</body>
 </html>
